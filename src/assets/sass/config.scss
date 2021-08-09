@@ -1,0 +1,56 @@
+$sp-size: 751;
+
+@mixin pc {
+  @media screen and (min-width: 752px) {
+    @content;
+  }
+}
+
+@mixin sp {
+  @media screen and (max-width: 751px) {
+    @content;
+  }
+}
+
+@function vw($px) {
+  @return $px / $sp-size * 100vw;
+}
+.forSp {
+  @include pc {
+    display: none!important;
+  }
+}
+.forPc {
+  @include sp {
+    display: none!important;
+  }
+}
+
+img {
+  width: 100%;
+  display: block;
+}
+
+a {
+  &:hover{
+    text-decoration: underline;
+  }
+}
+
+body {
+  font-family: 'Noto Sans JP', sans-serif;
+  @include pc {
+    min-width: 900px;
+  }
+}
+
+$lato: 'Lato', sans-serif;
+$base: #111733;
+
+.clear {
+  &::after {
+    content: "";
+    display: block;
+    clear: both;
+  }
+}
