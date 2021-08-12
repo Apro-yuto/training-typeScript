@@ -1,7 +1,7 @@
 // yuto nagashima  @@@@@@ https://github.com/Apro-yuto @@@@@@
 
-// 1, 今の天気をアイコンで表示
-// 2, 今日は雨が降るのかを表示。降るのであれば、何時頃か(テキスト)  例) 今日は降らないよ！ 例) 19時頃に雨が降るよ！
+// 1, 今の天気をアイコンで表示　OK
+// 2, 今日は雨が降るのかを表示。降るのであれば、何時頃か(テキスト)  例) 今日は降らないよ！ 例) 19時頃に雨が降るよ！　OK
 // 3, 12時の気温と20時の気温を、「昼」、「夜」と横並びで気温を表示。
 // 4, 警報があれば。背景赤で表示。
 
@@ -27,12 +27,12 @@ interface weatherAPIToday {
   "wind_deg": number,
   "wind_gust": number,
   "weather": [
-      {
-          "id": number,
-          "main": string,
-          "description": string,
-          "icon": string
-      }
+    {
+      "id": number,
+      "main": string,
+      "description": string,
+      "icon": string
+    }
   ],
   "pop": number
 }
@@ -43,87 +43,76 @@ class CurrentLocation {
       (
         resolve: (position: GeolocationPosition) => void,
         reject: (positionError: GeolocationPositionError) => void,
-      ) => {
-        if (!navigator.geolocation) {
+        ) => {
+          if (!navigator.geolocation) {
+            
+            const error: GeolocationPositionError = {
+              code: 0,
+              message: 'geolocation not supported.',
+              PERMISSION_DENIED: 0,
+              POSITION_UNAVAILABLE: 0,
+              TIMEOUT: 0,
+            }
+            reject(error);
 
-          const error: GeolocationPositionError = {
-            code: 0,
-            message: 'geolocation not supported.',
-            PERMISSION_DENIED: 0,
-            POSITION_UNAVAILABLE: 0,
-            TIMEOUT: 0,
           }
-          reject(error);
 
+          const geolocation: Geolocation = navigator.geolocation
+
+          const successCallback: PositionCallback = (position: GeolocationPosition): void => {
+            resolve(position)
+          }
+
+          const errorCallback: PositionErrorCallback = (positionError: GeolocationPositionError): void => {
+            reject(positionError)
+          }
+
+          const options: PositionOptions = {
+            // enableHighAccuracy: boolean,
+            // maximumAge: number,
+            // timeout: number,
+          }
+
+          geolocation.getCurrentPosition(successCallback, errorCallback, options);
         }
-
-        const geolocation: Geolocation = navigator.geolocation
-
-        const successCallback: PositionCallback = (position: GeolocationPosition): void => {
-          resolve(position)
-        }
-
-        const errorCallback: PositionErrorCallback = (positionError: GeolocationPositionError): void => {
-          reject(positionError)
-        }
-
-        const options: PositionOptions = {
-          // enableHighAccuracy: boolean,
-          // maximumAge: number,
-          // timeout: number,
-        }
-
-        geolocation.getCurrentPosition(successCallback, errorCallback, options);
+        )
       }
-    )
-  }
-}
+    }
 
-const loadDOM: HTMLElement = document.getElementById('load')!;
+    const loadDOM: HTMLElement = document.getElementById('load')!;
 
-CurrentLocation.getCurrentLocation().then( result => {
-  const floorLat: number = Math.floor(result.coords.latitude)
-  const floorLong: number = Math.floor(result.coords.longitude)
+    CurrentLocation.getCurrentLocation().then( result => {
+      const floorLat: number = Math.floor(result.coords.latitude)
+      const floorLong: number = Math.floor(result.coords.longitude)
 
-  axiosGet('https://api.openweathermap.org/data/2.5/onecall', {floorLat, floorLong})
+      axiosGet('https://api.openweathermap.org/data/2.5/onecall', {floorLat, floorLong})
 
-  loadDOM.style.display = 'none';
-}).catch( err => {
-  console.log(err)
-})
+      loadDOM.style.display = 'none';
+    }).catch( err => {
+      console.log(err)
+    })
 
-const axiosGet = (url: string, opt:axiosOpt): void=> {
-  const APIKEY: string = 'bb0e12659550392b8b3ca22b7089a50f'
-  axios.get(`${url}?lat=${opt.floorLat}&lon=${opt.floorLong}&appid=${APIKEY}&units=metric&lang=ja`)
-  .then( (res: any) => {
+    const axiosGet = (url: string, opt:axiosOpt): void=> {
+      const APIKEY: string = 'bb0e12659550392b8b3ca22b7089a50f'
+      axios.get(`${url}?lat=${opt.floorLat}&lon=${opt.floorLong}&appid=${APIKEY}&units=metric&lang=ja`)
+      .then( (res: any) => {
 
-    const rainyID: number = 622;
+        const currentData: weatherAPIToday = res.data.current;
+        const todayData: weatherAPIToday[] = res.data.hourly.slice(0,24);
 
-    // const testID: number = 622
+        // 1, 今の天気をアイコンで表示
+        inputWeatherIcon(currentData);
 
-    const currentData: weatherAPIToday = res.data.current;
-    const todayData: weatherAPIToday[] = res.data.hourly.slice(0,24);
+        // 2, 今日は雨が降るのかを表示。降るのであれば、何時頃か(テキスト)  例) 今日は降らないよ！ 例) 19時頃に雨が降るよ！
+        inputRainyLead(todayData)
+        console.log({res})
 
+      })
+    }
 
-    // 1, 今の天気をアイコンで表示
-    getWeatherIcon(currentData);
+    // 1, 今の天気をアイコンで表示 -- script
 
-
-    const checkRainy: weatherAPIToday[] = todayData.filter( (data: any, num:number, array: weatherAPIToday[] ) => {
-      data['num'] = num
-      console.log({data, num, array})
-      return data.weather[0].id < rainyID
-    } )
-
-    const rainyText =  checkRainy.length > 0 ? `${checkRainy[0].num}時間後に雨が降るよ！` : '今日は雨降らないよ！'
-    console.log({res,rainyText, checkRainy,currentData})
-
-  })
-}
-
-// 1, 今の天気をアイコンで表示 -- script
-
-function getWeatherIcon(currentData: weatherAPIToday): void {
+function inputWeatherIcon(currentData: weatherAPIToday): void {
   const sunnyID: number = 800;
   const cloudyID: number = 801;
 
@@ -137,11 +126,27 @@ function getWeatherIcon(currentData: weatherAPIToday): void {
     iconPath = 'img_rainy.png'
   }
 
-  inputDOM('weather_icon', iconPath)
+  inputDOM('weather_icon', `<img src="./assets/img/${iconPath}" alt="${iconPath}">`)
+}
+
+
+function inputRainyLead(todayData: weatherAPIToday[]): void {
+  if (!todayData) return;
+  const rainyID: number = 622;
+
+  const checkRainy: weatherAPIToday[] = todayData.filter( (data: any, num:number, array: weatherAPIToday[] ) => {
+    data['num'] = num
+    console.log({data, num, array})
+    return data.weather[0].id < rainyID
+  } )
+  const rainyText =  checkRainy.length > 0 ? `${checkRainy[0].num}時間後に雨が降るよ！` : '今日は雨降らないよ！'
+
+  inputDOM('today', rainyText)
 }
 
 // DOM操作
 function inputDOM(id: string, inputTxt: string): void {
+  if(!id || !inputTxt) return
   const $DOM: HTMLElement = document.getElementById(id)!;
   $DOM.innerHTML = inputTxt;
 }
