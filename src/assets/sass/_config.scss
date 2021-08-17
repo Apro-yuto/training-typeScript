@@ -1,13 +1,15 @@
-$sp-size: 751;
+$sp-size: 750;
+$pc-size: $sp-size + 1;
+$BG: #dbfdff;
 
 @mixin pc {
-  @media screen and (min-width: 752px) {
+  @media screen and (min-width: $pc-size) {
     @content;
   }
 }
 
 @mixin sp {
-  @media screen and (max-width: 751px) {
+  @media screen and (max-width: $sp-size) {
     @content;
   }
 }
@@ -39,6 +41,8 @@ a {
 
 body {
   font-family: 'Noto Sans JP', sans-serif;
+  font-weight: 100;
+  background: $BG;
   @include pc {
     min-width: 900px;
   }
@@ -53,4 +57,10 @@ $base: #111733;
     display: block;
     clear: both;
   }
+}
+
+.fixed {
+  position: fixed;
+  top: 0;
+  left: 0;
 }

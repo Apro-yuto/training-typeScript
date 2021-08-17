@@ -5,20 +5,35 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>typeScript-weather</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@100;300&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="./assets/css/reset.css">
   <link rel="stylesheet" href="./assets/css/style.css">
 </head>
 <body>
-  <h1 class="weather_title">NOW WEATHER</h1>
-  <p id="currentDate"></p>
-  <div id="weather_icon"></div>
+  <div id="weather" class="weather">
+    <h1 class="weather_title">NOW WEATHER</h1>
+    <div class="weather_content">
 
-  <p class="weather_today" id="today"></p>
+      <p id="currentDate" class="weather_date"></p>
+      <div id="weather_icon" class="weather_icon"></div>
 
-  <p class="weather_feelTemp"></p>
-  <div class="temps">
-    <div id="tempDay" class="temp-item"></div>
-    <div id="tempNight" class="temp-item"></div>
+      <p class="weather_today" id="today"></p>
+
+      <p class="weather_feelTemp"></p>
+      <div class="weather_temps">
+        <div class="weather_temps_item">
+          <p class="weather_temps_item-ttl">お昼</p>
+          <p id="tempDay"></p>
+        </div>
+        <div class="weather_temps_item">
+          <p class="weather_temps_item-ttl">夕方</p>
+          <p id="tempNight"></p>
+        </div>
+      </div>
+
+    </div>
   </div>
 
   <div id="load">

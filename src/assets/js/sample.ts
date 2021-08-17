@@ -1,5 +1,6 @@
 // yuto nagashima  @@@@@@ https://github.com/Apro-yuto @@@@@@
 
+// 仕様
 // 1, 今の天気をアイコンで表示　OK
 // 2, 今日は雨が降るのかを表示。降るのであれば、何時頃か(テキスト)  例) 今日は降らないよ！ 例) 19時頃に雨が降るよ！　OK
 // 3, 12時の気温と20時の気温を、「昼」、「夜」と横並びで気温を表示。
@@ -89,6 +90,7 @@ class CurrentLocation {
 }
 
 const loadDOM: HTMLElement = document.getElementById('load')!;
+const weather: HTMLElement = document.querySelector('#weather')!;
 
 CurrentLocation.getCurrentLocation().then( result => {
   const floorLat: number = Math.floor(result.coords.latitude)
@@ -120,7 +122,9 @@ const axiosGet = (url: string, opt:axiosOpt): void=> {
 
     // 何月何日何時何分の情報かを表示。
     isCurrentDate(currentData.dt)
-    console.log({res})
+
+    weather.style.visibility = 'visible'
+    weather.style.opacity = '1'
 
   })
 }
@@ -150,9 +154,8 @@ function inputRainyLead(todayData: weatherAPIToday[]): void {
   if (!todayData) return;
   const rainyID: number = 622;
 
-  const checkRainy: weatherAPIToday[] = todayData.filter( (data: any, num:number, array: weatherAPIToday[] ) => {
+  const checkRainy: weatherAPIToday[] = todayData.filter( (data: any, num:number ) => {
     data['num'] = num
-    console.log({data, num, array})
     return data.weather[0].id < rainyID
   } )
   const rainyText =  checkRainy.length > 0 ? `${checkRainy[0].num}時間後に雨が降るよ！` : '今日は雨降らないよ！'
@@ -191,6 +194,3 @@ function inputDOM(id: string, inputTxt: string): void {
 
 
 // yuto nagashima  @@@@@@ https://github.com/Apro-yuto @@@@@@
-
-
-
